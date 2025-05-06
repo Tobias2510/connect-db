@@ -1,3 +1,3 @@
-# Connect-db
+# connect-db
 
-Connect-db is a simple database-connection-string generator developed in nextjs 15 with shadcnUI.
+connect-db is a simple database-connection-string generator developed in nextjs 15 with shadcnUI.
