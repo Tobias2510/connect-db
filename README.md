@@ -2,7 +2,7 @@
 
 Easily generate database connection strings for popular databases with a clean UI powered by Next.js, Tailwind CSS, and shadcn/ui.
 
-🔥 Check it out at: [https://connect-db-three.vercel.app]
+🔥 Check it out at: https://connect-db-three.vercel.app
 
 ![screenshot](./public/screenshot.png)
 
