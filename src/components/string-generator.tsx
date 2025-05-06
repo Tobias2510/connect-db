@@ -13,7 +13,9 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { DatabaseParams } from "@/lib/types";
 import { cn } from "@/lib/utils";
+import { Check, Copy, Eye, EyeClosed } from "lucide-react";
 import { ChangeEvent, useEffect, useState } from "react";
+import { toast } from "sonner";
 
 const databases = [
   { name: "PostgreSQL", color: "from-blue-500 to-blue-700" },
@@ -38,7 +40,9 @@ const databases = [
 ];
 
 export default function StringGenerator() {
+  const [copied, setCopied] = useState<boolean>(false);
   const [databaseType, setDatabaseType] = useState<string>();
+  const [showPassword, setShowPassword] = useState<boolean>(false);
   const [connectionString, setConnectionString] = useState<string>("");
   const [databaseParams, setDatabaseParams] = useState<DatabaseParams>({
     username: "",
@@ -101,11 +105,23 @@ export default function StringGenerator() {
     }
   }
 
+  function handleCopy() {
+    navigator.clipboard.writeText(connectionString);
+    toast.success("Connection string copied to clipboard!");
+    setCopied(true);
+    setTimeout(() => setCopied(false), 4000);
+  }
+
   useEffect(() => {
     if (databaseType) {
       setConnectionString(generateConnectionString());
     }
   }, [databaseType, databaseParams]);
+
+  const maskedConnectionString = connectionString.replace(
+    /^(.+?:\/\/[^:]+:)([^@]+)(@.*)$/,
+    (_, prefix, __, suffix) => `${prefix}*****${suffix}`,
+  );
 
   return (
     <>
@@ -146,13 +162,22 @@ export default function StringGenerator() {
                 <Label htmlFor="password" className="mb-1.5">
                   Password
                 </Label>
-                <Input
-                  id="password"
-                  type="password"
-                  className="w-fit"
-                  value={databaseParams.password}
-                  onChange={handleChange}
-                />
+                <div className="relative">
+                  <Input
+                    id="password"
+                    type={showPassword ? "text" : "password"}
+                    className="box-border w-fit pr-8"
+                    value={databaseParams.password}
+                    onChange={handleChange}
+                  />
+                  <Button
+                    variant={"ghost"}
+                    onClick={() => setShowPassword((prev) => !prev)}
+                    className="absolute top-0 right-0 z-10"
+                  >
+                    {showPassword ? <Eye /> : <EyeClosed />}
+                  </Button>
+                </div>
               </div>
               <div>
                 <Label htmlFor="domain" className="mb-1.5">
@@ -202,11 +227,20 @@ export default function StringGenerator() {
               />
             </div>
           )}
-          <Textarea
-            value={connectionString}
-            readOnly
-            className="bg-slate-200 dark:bg-slate-800"
-          />
+          <div className="relative">
+            <Textarea
+              value={showPassword ? connectionString : maskedConnectionString}
+              readOnly
+              className="bg-slate-200 dark:bg-slate-800"
+            />
+            <Button
+              variant={"outline"}
+              onClick={handleCopy}
+              className="absolute top-3 right-3"
+            >
+              {copied ? <Check /> : <Copy />}
+            </Button>
+          </div>
         </CardContent>
       </Card>
     </>
